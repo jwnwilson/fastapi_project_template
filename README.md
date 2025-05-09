@@ -1,3 +1,3 @@
 # {{project_name}} Project
 
-Update from template 2
+Update from template 3
