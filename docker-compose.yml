@@ -1,0 +1,82 @@
+# For local development, only database is running
+#
+# docker compose up -d
+# uvicorn app.main:app --reload
+#
+version: '3.8'
+services:
+  api:
+    container_name: {{project_slug}}
+    platform: "linux/amd64"
+    env_file:
+      - env/docker.env
+    image: "{{project_slug}}"
+    build: 
+      context: ../../
+      dockerfile: infra/docker/{{cloud_provider}}.Dockerfile
+      args:
+          PROJECT: {{project_slug}}
+    # Run this contain as if it's in the terminal, useful for debugging
+    tty: true
+    # Mount local files into the container so we can update files inside the container
+    volumes:
+      - ../../libs:/libs
+      - ./src:/code/src
+    expose:
+      - "8000"
+    ports:
+      - 0.0.0.0:8000:8000
+    {% if use_db == "y" %}
+    depends_on:
+      - db
+    {% endif %}
+    {% if cloud_provider == "aws" %}
+    # Override lambda entry point to revert to default docker behaviour
+    entrypoint: ""
+    command: "uvicorn app.adaptor.into.fastapi.main:app --host 0.0.0.0 --port 80 --reload --debug"
+    {% endif %}
+
+{% if use_db == "y" and use_db_logic == 'sql' %}
+  db:
+    container_name: {{project_slug}}_db
+    restart: unless-stopped
+    image: postgres:15
+    volumes:
+      - ./tools/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
+      - ./tools:/code/tools
+      - postgres_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES={{project_slug}}_db,test_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    env_file:
+      - env/docker.env
+    ports:
+      - "0.0.0.0:5432:5432"
+    expose:
+      - "5432"
+{% endif %}
+{% if (use_db == "y" and use_db_logic == 'nosql') or use_task %}
+  localstack:
+    container_name: "{{project_slug}}-localstack"
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
+      - PERSISTENCE=1
+    volumes:
+      - localstack:/var/lib/localstack
+      - "/var/run/docker.sock:/var/run/docker.sock"
+{% endif %}
+
+
+volumes:
+  {% if use_db == "y" and use_db_logic == 'sql' %}
+  postgres_db:
+  {% endif %}
+  {% if use_db == "y" and use_db_logic == 'nosql' or use_task %}
+  localstack:
+  {% endif %}

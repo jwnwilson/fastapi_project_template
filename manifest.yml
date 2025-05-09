@@ -1,0 +1,18 @@
+features:
+  - name: sql
+    enabled: {{use_db == 'y' and use_db_logic == 'sql'}}
+    resources:
+      - src/app/adaptor/db/sql
+  - name: nosql
+    enabled: {{use_db == 'y' and use_db_logic == 'nosql'}}
+    resources:
+      - src/app/adaptor/db/nosql
+  - name: storage
+    enabled: {{use_storage}}
+    resources:
+      - src/app/adaptor/storage
+  - name: api
+    enabled: {{use_api}}
+    resources:
+      - src/app/interactor/api
+      - src/tests/interactor/api

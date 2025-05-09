@@ -1,0 +1,30 @@
+{
+    "cloud_provider": [
+        "aws"
+    ],
+    "use_api": "y",
+    "use_db": "y",
+    "use_storage": "y",
+    "use_task": "Y",
+    "api_domain": "jwnwilson.co.uk",
+    "use_db_logic": [
+        "sql",
+        "nosql"
+    ],
+    "__conditions__": {
+        "use_db_logic": "{{ use_db != 'n' }}",
+        "api_domain": "{{ use_api != 'n' }}"
+    },
+    "__prompts__": {
+        "use_api": "Do you want fastapi?",
+        "use_db": "Do you want a database?",
+        "use_storage": "Do you want to store files?",
+        "use_task": "Do you want to run async (background) tasks?",
+        "use_db_logic": {
+            "__prompt__": "Select the db storage method",
+            "sql": "Add Sqlalchemy to project",
+            "nosql": "Add NoSQL DB to project"
+        },
+        "api_domain": "Enter domain for project"
+    }
+}
