@@ -26,35 +26,31 @@ version:
     default: 0.1.0
 
 use_api:
-    type: str
+    type: bool
     help: Do you want to use API functionality?
-    choices: ["y", "n"]
-    default: "n"
+    default: false
 
 use_db:
-    type: str
+    type: bool
     help: Do you want to use database functionality?
-    choices: ["y", "n"]
-    default: "n"
+    default: false
 
 use_db_logic:
     type: str
     help: What type of database do you want to use?
     choices: ["sql", "nosql"]
     default: "sql"
-    when: "{{ use_db == 'y' }}"
+    when: "{{ use_db }}"
 
 use_storage:
-    type: str
+    type: bool
     help: Do you want to use cloud storage functionality?
-    choices: ["y", "n"]
-    default: "n"
+    default: false
 
 use_task:
     type: str
     help: Do you want to use task queue functionality?
-    choices: ["y", "n"]
-    default: "n"
+    default: false
 
 _templates_suffix: ""
 # Jinja2 environment configuration
