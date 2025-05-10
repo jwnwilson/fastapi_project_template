@@ -3,16 +3,16 @@ from collections.abc import Generator
 from typing import Any
 from unittest.mock import Mock
 import pytest
-{% if use_api == 'y' %}
+{% if use_api %}
 from fastapi.testclient import TestClient
 {% endif %}
 
-{% if use_db == "y" %}
+{% if use_db %}
 from hexrepo_db.interface import UOW
 {% endif %}
-{% if use_db == "y" and use_db_logic == "sql" %}
+{% if use_db and use_db_logic == "sql" %}
 from app.adaptor.db.sql.uow import SqlUOW
-{% elif use_db == "y" and use_db_logic == "nosql" %}
+{% elif use_db and use_db_logic == "nosql" %}
 from app.adaptor.db.nosql import DynamoUOW
 {% else %}
 from app.interactor.dependencies import StubbedUOW
@@ -21,7 +21,7 @@ from hexrepo_db import UOW
 
 from app.domain.example import ExampleDTO
 
-{% if use_db == "y" and use_db_logic == "sql" %}
+{% if use_db and use_db_logic == "sql" %}
 # Silence SQLALchemy deprecation warning until we can upgrade
 os.environ["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"
 
@@ -70,7 +70,7 @@ def uow(SQLALCHEMY_DATABASE_URL) -> Generator[UOW, None, None]:
     with uow.transaction() as session:
         reset_db(uow)
         yield uow
-{% elif use_db == "y" and use_db_logic == "nosql" %}
+{% elif use_db and use_db_logic == "nosql" %}
 @pytest.fixture
 def uow() -> Generator[UOW, None, None]:
     """
@@ -82,7 +82,7 @@ def uow() -> Generator[UOW, None, None]:
 {% endif %}
 
 
-{% if use_db == "y" and use_db == "y" %}
+{% if use_db and use_db %}
 @pytest.fixture(scope="function")
 def create_tables(uow: UOW):
     reset_db(uow)
@@ -94,13 +94,13 @@ def drop_tables(uow: UOW):
 {% endif %}
 
 
-{% if use_api == 'y' and use_db == 'n' %}
+{% if use_api and use_db == 'n' %}
 @pytest.fixture
 def uow() -> Generator[UOW, None, None]:
     yield StubbedUOW(db_url="test")
 {% endif %}
 
-{% if use_api == "y" %}
+{% if use_api %}
 @pytest.fixture
 def client(uow):
     from app.interactor.api.fastapi import app

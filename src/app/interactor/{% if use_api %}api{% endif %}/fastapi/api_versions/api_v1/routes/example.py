@@ -4,13 +4,13 @@ from fastapi import Depends
 from pydantic import BaseModel
 
 from hexrepo_api import CrudRouter
-{% if use_task == "y" %}
+{% if use_task %}
 from hexrepo_task.adaptor.db import QueueUOW
 from hexrepo_task.interface import TaskDTO
 {% endif %}
 
 from app.domain.example import ExampleDTO
-{% if use_task == "y" %}
+{% if use_task %}
 from app.interactor.event.tasks.app import create_example_task
 
 from ......dependencies import get_queue_uow, get_uow
@@ -41,7 +41,7 @@ router_v1 = CrudRouter(
     update_schema=UpdateExampleDTO,
 )
 
-{% if use_task == "y" %}
+{% if use_task %}
 @router_v1.router.post("/task")
 def start_task():
     params: ExampleDTO = ExampleDTO(

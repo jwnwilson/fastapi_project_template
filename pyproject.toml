@@ -8,7 +8,7 @@ version = "{{version}}"
 description = "{{description}}"
 readme = "README.md"
 dependencies = [
-    {% if use_api == 'y' %}
+    {% if use_api %}
     "fastapi<1.0.0,>=0.115.3",
     "itsdangerous>=2.2.0",
     "uvicorn<1.0.0,>=0.32.0",
@@ -17,24 +17,24 @@ dependencies = [
     "requests<3.0.0,>=2.32.3",
     "python-dotenv<2.0.0,>=1.0.1",
     "pydantic-settings<3.0.0,>=2.6.0",
-    {% if use_db == 'y' and use_db_logic == 'sql' %}
+    {% if use_db and use_db_logic == 'sql' %}
     "alembic<2.0.0,>=1.13.3",
     "sqlalchemy-continuum>=1.4.2",
     "psycopg[binary]==3.2.6",
-    {% elif use_db == 'y' and use_db_logic == 'nosql' %}
+    {% elif use_db and use_db_logic == 'nosql' %}
     "pymongo>=4.10.1",
     {% endif %}
-    {% if use_storage == 'y' %}
+    {% if use_storage %}
     "sentry-sdk[fastapi]>=2.25.1",
     "hexrepo-cloud",
     {% endif %}
-    {% if use_db == 'y' %}
+    {% if use_db %}
     "hexrepo-db",
     {% endif %}
-    {% if use_api == 'y' %}
+    {% if use_api %}
     "hexrepo-api",
     {% endif %}
-    {% if use_task == 'y' %}
+    {% if use_task %}
     "hexrepo-task",
     {% endif %}
     "hexrepo-log",
@@ -83,16 +83,16 @@ python_version = "3.12"
 strict = true
 
 [tool.uv.sources]
-{% if use_api == 'y' %}
+{% if use_api %}
 hexrepo-api = { path = "../../libs/interactor/api", editable = true }
 {% endif %}
-{% if use_db == 'y' %}
+{% if use_db %}
 hexrepo-db = { path = "../../libs/adaptor/db", editable = true }
 {% endif %}
-{% if use_storage == 'y' %}
+{% if use_storage %}
 hexrepo-cloud = { path = "../../libs/adaptor/cloud", editable = true }
 {% endif %}
-{% if use_task == 'y' %}
+{% if use_task %}
 hexrepo-task = { path = "../../libs/interactor/task", editable = true }
 {% endif %}
 hexrepo-log = { path = "../../libs/adaptor/log", editable = true }

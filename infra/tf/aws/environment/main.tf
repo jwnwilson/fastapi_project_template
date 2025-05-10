@@ -19,7 +19,7 @@ locals {
     region = data.aws_region.current.name
 }
 
-{% if use_db == "y" and use_db_logic == "sql" %}
+{% if use_db and use_db_logic == "sql" %}
 locals {
   db_url = "postgresql+psycopg://postgres:{password}@${module.{{project_slug}}_postgres.db_instance_endpoint}/${var.project}"
 }
@@ -40,7 +40,7 @@ data "aws_ecr_repository" "ecr_repo" {
   name                 = "hexrepo-${var.project}"
 }
 
-{% if use_db == "n" or (use_db == "y" and use_db_logic == "nosql") %}
+{% if use_db == "n" or (use_db and use_db_logic == "nosql") %}
 data "aws_security_group" "default_sg" {
   tags = {
     Name = "hexrepo-vpc-${terraform.workspace}-default"
@@ -56,39 +56,39 @@ module "{{project_slug}}_api" {
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag        = var.docker_tag
   vpc_id            = data.aws_vpc.hexrepo.id
-  {% if (cloud_provider == "aws" and use_api == "y") %}
+  {% if (cloud_provider == "aws" and use_api ) %}
   lambda_command    = ["src.app.interactor.api.lambda_handler"]
   {% elif cloud_provider == "aws" %}
   lambda_command    = ["src.app.interactor.event.lambda_handler"]
   {% else %}
   lambda_command    = ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
   {% endif %}
-  {% if use_db == "y" and use_db_logic == "sql" %}
+  {% if use_db and use_db_logic == "sql" %}
   security_group_ids = [module.{{project_slug}}_postgres.db_security_group_id]
   {% else %}
   security_group_ids = [data.aws_security_group.default_sg.id]
   {% endif %}
-  {% if use_db == "y" and use_db_logic == "nosql" %}
+  {% if use_db and use_db_logic == "nosql" %}
   # This should be modified to be restricted to all tables for this project with project_env prefix
   dynamodb_arn      = "arn:aws:dynamodb:${local.region}:${local.account_id}:table/{{project_slug}}_${terraform.workspace}*"
   {% endif %}
-  {% if use_storage == "y" %}
+  {% if use_storage %}
   bucket            = module.{{project_slug}}_bucket.bucket_name
   {% endif %}
 
   environment_variables = {
     ENVIRONMENT                 = terraform.workspace
     CLOUD_PROVIDER              = "{{ cloud_provider|upper }}"
-    {% if use_db == "y" and use_db_logic == "sql" %}
+    {% if use_db and use_db_logic == "sql" %}
     DB_URL                      = local.db_url
     DB_RO_URL                   = local.db_ro_url
     READ_REPLICA_ENABLED        = "false"
     DB_PASSWORD_SECRET_NAME     = data.aws_secretsmanager_secret.db_secret.name
     {% endif %}
-    {% if use_db == "y" and use_db_logic == "nosql" %}
+    {% if use_db and use_db_logic == "nosql" %}
     DB_URL                      = ""
     {% endif %}
-    {% if use_task == "y" %}
+    {% if use_task %}
     TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
     {% endif %}
     CLIENT_ID               = module.common_auth.client_id
@@ -96,7 +96,7 @@ module "{{project_slug}}_api" {
   }
 }
 
-{% if use_task == "y" %}
+{% if use_task %}
 module "queue" {
   source = "../../../../../../infra/tf/aws/modules/sqs"
 
@@ -146,7 +146,7 @@ module "{{project_slug}}_api_gateway" {
   auth_enabled          = false
 }
 
-{% if use_db == "y" and use_db_logic == "sql" %}
+{% if use_db and use_db_logic == "sql" %}
 module "{{project_slug}}_postgres" {
   source = "../../../../../../infra/tf/aws/modules/rds"
 
@@ -159,7 +159,7 @@ module "{{project_slug}}_postgres" {
 data "aws_secretsmanager_secret" "db_secret" {
   arn = module.{{project_slug}}_postgres.db_password_secret_arn
 }
-{% elif use_db == "y" and use_db_logic == "nosql" %}
+{% elif use_db and use_db_logic == "nosql" %}
 module "{{project_slug}}_dynamodb" {
   source = "../../../../../../infra/tf/aws/modules/dynamodb"
 
@@ -169,7 +169,7 @@ module "{{project_slug}}_dynamodb" {
 }
 {% endif %}
 
-{% if use_storage == "y" %}
+{% if use_storage %}
 module "{{project_slug}}_bucket" {
   source = "../../../../../../infra/tf/aws/modules/s3"
 

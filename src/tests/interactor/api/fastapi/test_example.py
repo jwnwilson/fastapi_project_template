@@ -10,7 +10,7 @@ def example_data_missing_url():
 def test_example_create(client: TestClient, example_data):
     response = client.post("/api/v1/example/", json=example_data)
     assert response.status_code == 200
-    {% if use_db == "y" %}
+    {% if use_db %}
     assert response.json()["name"] == example_data["name"]
     assert response.json()["url"] == example_data["url"]
     {% endif %}
@@ -29,7 +29,7 @@ def test_example_read(client: TestClient, created_example):
     assert response.json()["url"] == created_example.url
 
 
-{% if use_db == "y" and use_db_logic == "sql" %}
+{% if use_db and use_db_logic == "sql" %}
 def test_example_read_filter_name(client: TestClient, created_example):
     response = client.get(
         f'/api/v1/example/?filters=%7B"name"%3A"{created_example.name}"%7D'
@@ -50,7 +50,7 @@ def test_example_update(client: TestClient, created_example):
     updated_data = {"url": "test2.com"}
     response = client.patch(f"/api/v1/example/{company_id}", json=updated_data)
     assert response.status_code == 200
-    {% if use_db == "y" %}
+    {% if use_db %}
     assert response.json()["url"] == updated_data["url"]
 
     # Verify the update
@@ -65,7 +65,7 @@ def test_example_delete(client: TestClient, created_example):
     response = client.delete(f"/api/v1/example/{company_id}")
     assert response.status_code == 204
 
-    {% if use_db == "y" %}
+    {% if use_db %}
     # Verify the delete
     response = client.get(f"/api/v1/example/{company_id}")
     assert response.status_code == 404

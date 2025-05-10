@@ -21,7 +21,7 @@ build:
 	docker compose build
 
 # DB management
-{% if use_db == "y" and use_db_logic == "sql" %}
+{% if use_db and use_db_logic == "sql" %}
 db: docker_stop
 	docker compose run --service-ports -d db 
 
@@ -46,7 +46,7 @@ db_downgrade:
 
 db_create_migration: 
 	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
-{% elif use_db == "y" and use_db_logic == "nosql" %}
+{% elif use_db and use_db_logic == "nosql" %}
 db: docker_stop
 	docker compose run --service-ports -d localstack
 
@@ -79,7 +79,7 @@ run_docker:
 	docker compose up
 
 # Testing commands
-{% if use_db == "y"%}
+{% if use_db %}
 test: venv db
 {% else %}
 test: venv
