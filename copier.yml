@@ -28,12 +28,12 @@ version:
 use_api:
     type: bool
     help: Do you want to use API functionality?
-    default: false
+    default: true
 
 use_db:
     type: bool
     help: Do you want to use database functionality?
-    default: false
+    default: true
 
 use_db_logic:
     type: str
@@ -45,12 +45,12 @@ use_db_logic:
 use_storage:
     type: bool
     help: Do you want to use cloud storage functionality?
-    default: false
+    default: true
 
 use_task:
     type: bool
     help: Do you want to use task queue functionality?
-    default: false
+    default: true
 
 _templates_suffix: ""
 # Jinja2 environment configuration
