@@ -56,6 +56,7 @@ use_task:
     choices: ["y", "n"]
     default: "n"
 
+_templates_suffix: ""
 # Jinja2 environment configuration
 _jinja2_env_vars:
     lstrip_blocks: true
