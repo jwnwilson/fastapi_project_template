@@ -76,7 +76,7 @@ def uow() -> Generator[UOW, None, None]:
     """
     Return db adaptor with initialised DB & DB session.
     """
-    uow = DynamoUOW(db_url="http://localhost:8888")
+    uow = DynamoUOW(db_url="http://localhost:4566")
     # Create DB session
     yield uow
 {% endif %}
