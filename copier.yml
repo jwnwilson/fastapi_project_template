@@ -48,7 +48,7 @@ use_storage:
     default: false
 
 use_task:
-    type: str
+    type: bool
     help: Do you want to use task queue functionality?
     default: false
 
