@@ -108,8 +108,8 @@ tf_init:
 	@echo "Initializing Terraform infra"
 	@rm -rf ./infra/tf/aws/shared/.terraform
 	@rm -rf ./infra/tf/aws/environment/.terraform
-	cd infra/tf/aws/shared  && terraform init -input=false
-	cd infra/tf/aws/environment  && terraform init -input=false
+	cd infra/tf/aws/shared  && terraform init -input=false -upgrade
+	cd infra/tf/aws/environment  && terraform init -input=false -upgrade
 
 tf_setup: tf_init
 	@echo "Applying Inital project Terraform infra"
