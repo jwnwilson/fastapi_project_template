@@ -1,0 +1,11 @@
+deployments:
+  - hextech-{{ project_slug }}:
+    container_image: {{ project_slug }}
+    targets:
+      - module.{{ project_slug }}_ecs_alb
+  - hextech-{{ project_slug }}-lambda:
+    container_image: {{ project_slug }}-lambda
+    targets:
+      - module.{{ project_slug }}_api
+      - module.example_tasks
+
