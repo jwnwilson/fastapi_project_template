@@ -4,6 +4,7 @@ from collections.abc import Generator
 from pydantic import BaseModel
 
 from app.config import config
+from hexrepo_task.interface import QueueConfig
 {% if use_task %}
 from hexrepo_task import QueueAdaptor, SqsQueueAdaptor
 from hexrepo_task.adaptor.db import QueueUOW
@@ -66,6 +67,7 @@ def get_queue_uow() -> Generator[UOW, None, None]:
 
 
 def get_task_queue() -> Generator[QueueAdaptor, None, None]:
-    queue = SqsQueueAdaptor(queue="hexrepo-tasks")
+    queue_config: QueueConfig = QueueConfig(default_queue=config.TASK_QUEUE)
+    queue = SqsQueueAdaptor(config=queue_config)
     yield queue
 {% endif %}

@@ -35,6 +35,8 @@ class Config(BaseSettings):
 
     # FEATURE FLAGS
 
+    TASK_QUEUE: str = os.environ.get("TASK_QUEUE", "{{project_slug}}-tasks")
+
     # Database settings
     DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "").format(env=ENVIRONMENT)
     DB_URL: str = os.environ["DB_URL"]
