@@ -84,15 +84,15 @@ strict = true
 
 [tool.uv.sources]
 {% if use_api %}
-hexrepo-api = { path = "../../libs/interactor/api", editable = true }
+hexrepo-api = { path = "../../libs/api", editable = true }
 {% endif %}
 {% if use_db %}
-hexrepo-db = { path = "../../libs/adaptor/db", editable = true }
+hexrepo-db = { path = "../../libs/db", editable = true }
 {% endif %}
 {% if use_storage %}
-hexrepo-cloud = { path = "../../libs/adaptor/cloud", editable = true }
+hexrepo-cloud = { path = "../../libs/cloud", editable = true }
 {% endif %}
 {% if use_task %}
-hexrepo-task = { path = "../../libs/interactor/task", editable = true }
+hexrepo-task = { path = "../../libs/task", editable = true }
 {% endif %}
-hexrepo-log = { path = "../../libs/adaptor/log", editable = true }
+hexrepo-log = { path = "../../libs/log", editable = true }

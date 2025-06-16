@@ -1,7 +1,7 @@
 from hexrepo_task.interactor.event.app import Dependency, resolve_dependencies
 
 from app.adaptor.db.sql import SqlUOW
-from app.domain.user import UserPermissionCreateDTO
+from app.domain.example import ExampleDTO
 
 from ...dependencies import get_uow
 from ..celery import celery_app
@@ -15,6 +15,6 @@ def test_task():
 @celery_app.task
 @resolve_dependencies
 def create_example_task(
-    user_dto: UserPermissionCreateDTO, uow: SqlUOW = Dependency(get_uow)
+    example: ExampleDTO, uow: SqlUOW = Dependency(get_uow)
 ):
-    uow.user.create(user_dto)
+    print(example)
