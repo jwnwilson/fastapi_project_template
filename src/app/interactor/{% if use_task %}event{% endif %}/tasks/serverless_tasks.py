@@ -8,7 +8,7 @@ from ..lambda_app import app
 
 
 @app.task
-def create_example_task_serverless(
+def example_task(
     example: ExampleDTO, uow: SqlUOW = Dependency(get_uow)
 ):
     print(example)
