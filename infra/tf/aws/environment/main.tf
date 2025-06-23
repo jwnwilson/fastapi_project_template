@@ -153,13 +153,14 @@ module "queue" {
   name        = "${var.project}-${terraform.workspace}"
   environment = terraform.workspace
 }
+{% endif %}
 
+{% if use_task and use_task_type == "serverless" %}
 resource "aws_lambda_event_source_mapping" "queue_lambda_mapping" {
   event_source_arn = module.queue.queue_arn
   function_name    = module.{{project_slug}}_tasks.lambda_function_name
 }
 
-{% if use_task and use_task_type == "serverless" %}
 module "{{project_slug}}_tasks" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
