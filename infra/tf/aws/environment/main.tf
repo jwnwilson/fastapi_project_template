@@ -48,6 +48,7 @@ data "aws_security_group" "default_sg" {
 }
 {% endif %}
 
+{% if use_api and use_api_type == "serverless" %}
 module "{{project_slug}}_api" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
@@ -95,6 +96,54 @@ module "{{project_slug}}_api" {
     USER_POOL_ID            = module.common_auth.user_pool_id
   }
 }
+{% endif %}
+
+{% if use_api and use_api_type == "container" %}
+module "{{project_slug}}_ecs_api" {
+  source             = "../../../../../../infra/tf/aws/modules/ecs"
+  project            = var.project
+  name               = "api"
+  environment        = terraform.workspace
+  aws_region         = var.aws_region
+  vpc_id             = data.aws_vpc.hexrepo.id
+  private_subnet_ids = data.aws_subnets.private.ids
+  security_group_ids = [module.common_postgres.db_security_group_id]
+  target_group_arn   = module.common_alb.target_group_arn
+  # This costs money
+  container_insights = "disabled"
+  min_capacity       = 0
+
+  ecr_url        = data.aws_ecr_repository.ecr_repo.repository_url
+  docker_tag     = var.docker_tag_container
+  container_port = 8000
+
+  environment_variables = {
+    ENVIRONMENT             = terraform.workspace
+    PROJECT                 = var.project
+    CLOUD_PROVIDER          = "AWS"
+    DB_URL                  = local.db_url
+    DB_RO_URL               = local.db_ro_url
+    READ_REPLICA_ENABLED    = "false"
+    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
+    CLIENT_ID               = module.common_auth.client_id
+    USER_POOL_ID            = module.common_auth.user_pool_id
+    ALLOWED_ORIGINS         = "*"
+    LOG_JSON                = "true"
+    ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
+    TASK_TABLE_NAME         = module.common_task_nosql.table_name
+    LOG_LEVEL               = "INFO"
+  }
+  secrets = {
+    DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
+  }
+
+  desired_count = 1
+  task_cpu      = 256
+  task_memory   = 512
+}
+{% endif %}
+
 
 {% if use_task %}
 module "queue" {
@@ -110,6 +159,7 @@ resource "aws_lambda_event_source_mapping" "queue_lambda_mapping" {
   function_name    = module.{{project_slug}}_tasks.lambda_function_name
 }
 
+{% if use_task and use_task_type == "serverless" %}
 module "{{project_slug}}_tasks" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
@@ -129,6 +179,53 @@ module "{{project_slug}}_tasks" {
     READ_REPLICA_ENABLED    = "false"
     DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
   }
+}
+{% endif %}
+
+{% if use_task and use_task_type == "container" %}
+module "{{project_slug}}_ecs_task" {
+  source = "../../../../../../infra/tf/aws/modules/ecs"
+
+  project            = var.project
+  name               = "task"
+  environment        = terraform.workspace
+  aws_region         = var.aws_region
+  vpc_id             = data.aws_vpc.hexrepo.id
+  private_subnet_ids = data.aws_subnets.private.ids
+  security_group_ids = [module.common_postgres.db_security_group_id]
+  # This costs money
+  container_insights = "disabled"
+
+  ecr_url        = data.aws_ecr_repository.ecr_repo.repository_url
+  container_command = ["celery", "-A", "app.interactor.event.celery.celery_app", "worker", "--loglevel=info"]
+  docker_tag     = var.docker_tag_container
+  container_port = 8000
+  min_capacity   = 0
+
+  environment_variables = {
+    ENVIRONMENT             = terraform.workspace
+    PROJECT                 = var.project
+    CLOUD_PROVIDER          = "AWS"
+    DB_URL                  = local.db_url
+    DB_RO_URL               = local.db_ro_url
+    READ_REPLICA_ENABLED    = "false"
+    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
+    CLIENT_ID               = module.common_auth.client_id
+    USER_POOL_ID            = module.common_auth.user_pool_id
+    ALLOWED_ORIGINS         = "*"
+    LOG_JSON                = "true"
+    ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
+    TASK_TABLE_NAME         = module.common_task_nosql.table_name
+    LOG_LEVEL               = "INFO"
+  }
+  secrets = {
+    DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
+  }
+
+  desired_count = 1
+  task_cpu      = 256
+  task_memory   = 512
 }
 {% endif %}
 

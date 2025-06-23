@@ -30,6 +30,13 @@ use_api:
     help: Do you want to use API functionality?
     default: true
 
+use_api_type:
+    type: str
+    help: What type of api do you want to use?
+    choices: ["serverless", "container"]
+    default: "container"
+    when: "{{ use_api }}"
+
 use_db:
     type: bool
     help: Do you want to use database functionality?
@@ -51,6 +58,13 @@ use_task:
     type: bool
     help: Do you want to use task queue functionality?
     default: true
+
+use_task_type:
+    type: str
+    help: What type of task queue do you want to use?
+    choices: ["serverless", "container"]
+    default: "container"
+    when: "{{ use_task }}"
 
 _templates_suffix: ""
 # Jinja2 environment configuration
