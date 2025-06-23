@@ -14,7 +14,11 @@ variable "project" {
   default = "{{project_slug}}"
 }
 
-variable "docker_tag" {
+variable "docker_tag_container" {
+  default = "latest"
+}
+
+variable "docker_tag_serverless" {
   default = "latest"
 }
 

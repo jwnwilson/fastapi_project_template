@@ -22,6 +22,7 @@ locals {
 {% if use_db and use_db_logic == "sql" %}
 locals {
   db_url = "postgresql+psycopg://postgres:{password}@${module.{{project_slug}}_postgres.db_instance_endpoint}/${var.project}"
+  db_ro_url = module.{{project_slug}}_postgres.db_instance_ro_endpoint != null ? "postgresql+psycopg://postgres:{password}@${module.{{project_slug}}_postgres.db_instance_ro_endpoint}/${var.project}" : "postgresql+psycopg://postgres:{password}@${module.{{project_slug}}_postgres.db_instance_endpoint}/${var.project}"
 }
 {% endif %}
 
@@ -271,7 +272,6 @@ module "{{project_slug}}_dynamodb" {
 module "{{project_slug}}_bucket" {
   source = "../../../../../../infra/tf/aws/modules/s3"
 
-  environment = terraform.workspace
   project     = "{{project_slug}}"
   name        = "{{project_slug}}"
 }
