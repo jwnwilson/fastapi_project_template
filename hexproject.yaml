@@ -1,17 +1,17 @@
 deployments:
-{{ if use_api and use_api_type == "container" }}
+{% if use_api and use_api_type == "container" %}
   - hextech-{{ project_slug }}:
     container_image: {{ project_slug }}
     image_type: container
     targets:
       - module.{{ project_slug }}_ecs_api
       - module.{{ project_slug }}_ecs_task
-{{ end }}
-{{ if use_api and use_api_type == "serverless" }}
+{% end %}
+{% if use_api and use_api_type == "serverless" %}
   - hextech-{{ project_slug }}-lambda:
     container_image: {{ project_slug }}-lambda
     image_type: serverless
     targets:
       - module.{{ project_slug }}_api
       - module.{{ project_slug }}_tasks
-{{ end }}
+{% end %}
