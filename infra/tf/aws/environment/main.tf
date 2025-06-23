@@ -107,10 +107,10 @@ module "queue" {
 
 resource "aws_lambda_event_source_mapping" "queue_lambda_mapping" {
   event_source_arn = module.queue.queue_arn
-  function_name    = module.example_tasks.lambda_function_name
+  function_name    = module.{{project_slug}}_tasks.lambda_function_name
 }
 
-module "example_tasks" {
+module "{{project_slug}}_tasks" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
   environment        = terraform.workspace
@@ -119,7 +119,7 @@ module "example_tasks" {
   docker_tag         = var.docker_tag
   vpc_id             = data.aws_vpc.hexrepo.id
   lambda_command     = ["src.app.interactor.event.lambda_handler"]
-  security_group_ids = [module.example_postgres.db_security_group_id]
+  security_group_ids = [module.{{project_slug}}_postgres.db_security_group_id]
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
@@ -164,7 +164,7 @@ module "{{project_slug}}_dynamodb" {
   source = "../../../../../../infra/tf/aws/modules/dynamodb"
 
   environment   = terraform.workspace
-  table_name    = "example" 
+  table_name    = "{{project_slug}}" 
   project       = "{{project_slug}}"
 }
 {% endif %}
@@ -175,6 +175,6 @@ module "{{project_slug}}_bucket" {
 
   environment = terraform.workspace
   project     = "{{project_slug}}"
-  name        = "example"
+  name        = "{{project_slug}}"
 }
 {% endif %}
