@@ -14,7 +14,7 @@ dependencies = [
     {% endif %}
     {% if use_api and use_api_framework == 'django-ninja' %}
     "django-ninja>=1.4.3",
-    "itsdangerous>=2.2.0",
+    "django-ninja-crud>=0.6.2",
     {% endif %}
     "uvicorn<1.0.0,>=0.32.0",
     "gevent<25.0.0,>=24.10.3",
