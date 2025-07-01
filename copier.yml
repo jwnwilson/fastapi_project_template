@@ -30,6 +30,13 @@ use_api:
     help: Do you want to use API functionality?
     default: true
 
+use_api_framework:
+    type: str
+    help: What api framework do you want to use_db?
+    choices: ["fastapi", django-ninja]
+    default: "fastapi"
+    when: "{{ use_api }}"
+
 use_api_type:
     type: str
     help: What type of api do you want to use?
