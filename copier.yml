@@ -78,3 +78,11 @@ _templates_suffix: ""
 _jinja2_env_vars:
     lstrip_blocks: true
     trim_blocks: true 
+
+_exclude:
+    - "{% if not use_api %}src/app/interactor/api/*{% endif %}"
+    - "{% if use_api_framework == 'fastapi' %}src/app/interactor/api/fastapi/*{% endif %}"
+    - "{% if use_api_framework == 'django-ninja' %}src/app/interactor/api/django-ninja/*{% endif %}"
+    - "{% if not use_task %}src/app/interactor/event/*{% endif %}"
+    - "{% if not use_db %}src/app/adaptor/db/*{% endif %}"
+    - "{% if not use_storage %}src/app/adaptor/storage/*{% endif %}"
