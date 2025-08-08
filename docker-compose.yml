@@ -13,7 +13,7 @@ services:
     image: "{{project_slug}}"
     build: 
       context: ../../
-      dockerfile: infra/docker/{{cloud_provider}}.Dockerfile
+      dockerfile: infra/docker/common.Dockerfile
       args:
           PROJECT: {{project_slug}}
     # Run this contain as if it's in the terminal, useful for debugging
