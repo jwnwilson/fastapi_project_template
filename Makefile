@@ -143,7 +143,7 @@ tf_output: tf_workspace
 	@cd infra/tf/aws/environment && terraform output -json
 
 deploy: build tf_workspace
-	PROJECT={{project_slug}} NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh 
+	hextech deploy-projects $(ENVIRONMENT) --no-input --projects={{project_slugj}}
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."
