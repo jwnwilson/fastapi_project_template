@@ -71,6 +71,9 @@ _templates_suffix: ""
 _jinja2_env_vars:
     lstrip_blocks: true
     trim_blocks: true 
+_envops:
+    lstrip_blocks: true
+    trim_blocks: true
 
 _exclude:
     - "{% if not use_api %}src/app/interactor/api{% endif %}"
